@@ -3,6 +3,7 @@
     package="com.example.networktracking">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -11,11 +12,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".Service.LocathionService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
 
         <activity
             android:name=".MainActivity"
@@ -27,6 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".Service.LocathionService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service android:name=".Service.GoogleService" android:enabled="true"
+            android:exported="true"></service>
         <receiver
             android:name=".Service.Receiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED"

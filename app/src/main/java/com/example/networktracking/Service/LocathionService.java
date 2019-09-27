@@ -4,7 +4,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Debug;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -16,18 +19,28 @@ import com.example.networktracking.R;
 public class LocathionService extends Service {
     private NotificationManager notificationManager;
     public static final int DEFAULT_NOTIFICATION_ID = 101;
+    private BroadcastReceiver mReceiver;
 
     public void onCreate() {
         super.onCreate();
         notificationManager = (NotificationManager) this.getSystemService(this.NOTIFICATION_SERVICE);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        mReceiver = new Receiver();
+        registerReceiver(mReceiver, filter);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         //Send Foreground Notification
-        sendNotification("Ticker","Title","Text");
-       // doTask();
+        //sendNotification("Ticker","Title","Text");
+        startForeground();
+        startService(new Intent(this, LocathionService.class));
         return START_REDELIVER_INTENT;
+    }
+
+    private void doTask() {
+        Log.d("Work","current time");
     }
 
 
@@ -58,6 +71,19 @@ public class LocathionService extends Service {
         startForeground(DEFAULT_NOTIFICATION_ID, notification);
     }
 
+   public void startForeground() {
+       //Log.d(LOCK_SCREAN_SERVICE,"Работа в серивисе");
+       Notification notification = new NotificationCompat.Builder(this)
+               .setContentTitle(getResources().getString(R.string.app_name))
+               .setTicker(getResources().getString(R.string.app_name))
+               .setContentText("Running")
+               .setSmallIcon(R.mipmap.ic_launcher)
+               .setContentIntent(null)
+               .setOngoing(true)
+               .build();
+       Log.d("Serv","result");
+       startForeground(9999, notification);
+   }
     @Override
     public IBinder onBind(Intent intent) {
         return null;
