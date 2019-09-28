@@ -31,7 +31,7 @@ public class GoogleService extends Service implements LocationListener {
     Location location;
     private Handler mHandler = new Handler();
     private Timer mTimer = null;
-    long notify_interval = 1000;
+    long notify_interval = 50000;
     public static String str_receiver = "servicetutorial.service.receiver";
     Intent intent;
 
@@ -51,7 +51,7 @@ public class GoogleService extends Service implements LocationListener {
         super.onCreate();
 
         mTimer = new Timer();
-        mTimer.schedule(new TimerTaskToGetLocation(), 5, notify_interval);
+        mTimer.schedule(new TimerTaskToGetLocation(), 1000, notify_interval);//откорректировать
         intent = new Intent(str_receiver);
         fn_getlocation();
     }
@@ -91,7 +91,7 @@ public class GoogleService extends Service implements LocationListener {
             if (isGPSEnable) {
                 location = null;
             }
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 15, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50000, 3, this);
             if (locationManager!=null){
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location!=null){
@@ -107,7 +107,7 @@ public class GoogleService extends Service implements LocationListener {
             }
             if (isNetworkEnable) {
                 location = null;
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 15, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 50000, 3, this);
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     if (location != null) {

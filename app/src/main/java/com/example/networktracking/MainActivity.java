@@ -35,6 +35,14 @@ import com.example.networktracking.PhoneStateListener;
 import com.example.networktracking.R;
 import com.example.networktracking.Service.GoogleService;
 import com.example.networktracking.Service.LocathionService;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -66,17 +74,16 @@ import static android.Manifest.permission.READ_PHONE_NUMBERS;
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int REQUEST_LOCATION = 123;
     private AppBarConfiguration mAppBarConfiguration;
     private Geocoder geocoder;
     private static final int REQUEST_PERMISSIONS = 100;
     boolean boolean_permission;
-    TextView tv_latitude, tv_longitude, tv_address,tv_area,tv_locality;
-    SharedPreferences mPref;
-    SharedPreferences.Editor medit;
+    private GoogleMap mMap;
+    private LatLng KazanPosithion = new LatLng(55.620147, 49.2910103);
     Double latitude,longitude;
-    TextView textView;
+
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     PhoneStateListener mPhoneStatelistener;
     TelephonyManager mTelephonyManager;
@@ -87,13 +94,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -104,15 +105,19 @@ public class MainActivity extends AppCompatActivity {
                 .setDrawerLayout(drawer)
                 .build();
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
 
+        mapFragment.getMapAsync(this);
         geocoder = new Geocoder(this, Locale.getDefault());
         //  startService(new Intent(this, SecondService.class));
         startService(new Intent(this,GoogleService.class));
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        /*NavController navController = Navigation.findNavController(this, R.id.na);//заменено
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+        NavigationUI.setupWithNavController(navigationView, navController);*/
         //  textView = findViewById(R.id.text_share);
         fn_permission();
+
         CheckPermisionsToPhone();
         mPhoneStatelistener = new PhoneStateListener();
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -192,13 +197,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
+ /*   @Override
     public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);//заменено
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
+*/
 
     private void fn_permission() {
         if ((ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -238,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 postRequest(model);
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e("Main",e.getMessage());
             }
             Intent intentService = new Intent(context, GoogleService.class);
             context.startService(intentService);
@@ -290,5 +296,23 @@ public class MainActivity extends AppCompatActivity {
     private String BuildUrl(String url,Model model) {
       String stringr =  MessageFormat.format("http://ds.scripthub.ru/service/api.php?module=add_point&operator={0}&signal_quality={1}&long={2}&lat={3}&type={4}", model.operator, model.signal, model.longitude,model.latitude,"4G");
       return stringr;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMinZoomPreference(12f);
+        mMap.setMaxZoomPreference(17f);
+
+
+        MarkerOptions   mp1 = new MarkerOptions();
+        mp1.position(KazanPosithion);
+
+        mp1.draggable(true);
+        mp1.icon(BitmapDescriptorFactory
+                .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        mMap.addMarker(mp1);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+               KazanPosithion, 20));
     }
 }

@@ -13,4 +13,5 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+    <string name="google_maps_key">AIzaSyB6N5SZJgYIT9XyC1GNHPfFC0-s0tvtVWs</string>
 </resources>
