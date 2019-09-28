@@ -13,8 +13,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="@color/cast_expanded_controller_text_color"
+        android:backgroundTint="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
         app:backgroundTint="@color/cast_expanded_controller_progress_text_color"
-        app:srcCompat="@drawable/ic_media_play_light" />
+        app:srcCompat="@android:drawable/ic_menu_mylocation" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/fab_margin"
+        android:backgroundTint="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
+        android:src="@drawable/quantum_ic_refresh_white_24"
+        app:backgroundTint="@color/cast_expanded_controller_progress_text_color" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
