@@ -1,6 +1,5 @@
 package com.example.networktracking.Service;
 
-
 import android.Manifest;
 import android.app.Service;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,19 +15,15 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.example.networktracking.MainActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 
 
-
 public class GoogleService extends Service implements LocationListener {
+
     boolean isGPSEnable = false;
     boolean isNetworkEnable = false;
     double latitude, longitude;
@@ -52,7 +46,6 @@ public class GoogleService extends Service implements LocationListener {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -83,7 +76,6 @@ public class GoogleService extends Service implements LocationListener {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void fn_getlocation() {
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         isGPSEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -92,25 +84,30 @@ public class GoogleService extends Service implements LocationListener {
         if (!isGPSEnable && !isNetworkEnable) {
 
         } else {
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+            }
+            if (isGPSEnable) {
+                location = null;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 15, this);
+            if (locationManager!=null){
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location!=null){
+                    Log.e("latitude",location.getLatitude()+"");
+                    Log.e("longitude",location.getLongitude()+"");
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    fn_update(location);
+                }
+            }
+            if(location!=null){
+                return;
+            }
             if (isNetworkEnable) {
                 location = null;
-
-
-                if (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    Activity#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for Activity#requestPermissions for more details.
-                    return;
-                }
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 15, this);
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     if (location != null) {
@@ -123,66 +120,28 @@ public class GoogleService extends Service implements LocationListener {
                         fn_update(location);
                     }
                 }
-
             }
-
-
-            if (isGPSEnable) {
-                location = null;
-                if (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    Activity#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for Activity#requestPermissions for more details.
-                    Log.e("GoogleService","Permissions");
-                    return;
-                }
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-                if (locationManager!=null){
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if (location!=null){
-                        Log.e("latitude",location.getLatitude()+"");
-                        Log.e("longitude",location.getLongitude()+"");
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                        fn_update(location);
-                    }
-                }
             }
-
-
         }
 
-    }
-
-    private class TimerTaskToGetLocation extends TimerTask{
+    private class TimerTaskToGetLocation extends TimerTask {
         @Override
         public void run() {
 
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        fn_getlocation();
-                    }
+                    fn_getlocation();
                 }
             });
-
         }
     }
 
-    private void fn_update(Location location){
+    public void fn_update(Location location){
 
         intent.putExtra("latutide",location.getLatitude()+"");
         intent.putExtra("longitude",location.getLongitude()+"");
         sendBroadcast(intent);
     }
-
 
 }
